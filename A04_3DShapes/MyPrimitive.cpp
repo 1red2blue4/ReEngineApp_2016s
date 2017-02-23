@@ -30,6 +30,15 @@ void MyPrimitive::AddQuad(vector3 a_vBottomLeft, vector3 a_vBottomRight, vector3
 	AddVertexPosition(a_vBottomRight);
 	AddVertexPosition(a_vTopRight);
 }
+
+//This will make the triang A->B->C
+void MyPrimitive::AddTri(vector3 a_vBottomLeft, vector3 a_vBottomRight, vector3 a_vTopLeft)
+{
+	AddVertexPosition(a_vBottomLeft);
+	AddVertexPosition(a_vBottomRight);
+	AddVertexPosition(a_vTopLeft);
+}
+
 void MyPrimitive::GeneratePlane(float a_fSize, vector3 a_v3Color)
 {
 	if (a_fSize < 0.01f)
@@ -102,24 +111,40 @@ void MyPrimitive::GenerateCube(float a_fSize, vector3 a_v3Color)
 void MyPrimitive::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color)
 {
 	if (a_nSubdivisions < 3)
+	{
 		a_nSubdivisions = 3;
+	}
 	if (a_nSubdivisions > 360)
+	{
 		a_nSubdivisions = 360;
+	}
+		
 
 	Release();
 	Init();
 
-	//Your code starts here
 	float fValue = 0.5f;
+	//Your code starts here
 	//3--2
 	//|  |
 	//0--1
-	vector3 point0(-fValue, -fValue, fValue); //0
-	vector3 point1(fValue, -fValue, fValue); //1
-	vector3 point2(fValue, fValue, fValue); //2
-	vector3 point3(-fValue, fValue, fValue); //3
-
-	AddQuad(point0, point1, point3, point2);
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		float interval = 2 * PI / a_nSubdivisions;
+		float theta = interval * i;
+		//circle
+		AddTri(
+			fValue*vector3(0.0f, 0.0f, 0.0f), 
+			fValue*a_fRadius*vector3(cos(theta), sin(theta), 0.0f),
+			fValue*a_fRadius*vector3(cos(theta + interval), sin(theta + interval), 0.0f)
+		);
+		//cone
+		AddTri(
+			fValue*a_fRadius*vector3(cos(theta), sin(theta), 0.0f),
+			fValue*vector3(0.0f, 0.0f, -a_fHeight),
+			fValue*a_fRadius*vector3(cos(theta + interval), sin(theta + interval), 0.0f)
+		);
+	}
 
 	//Your code ends here
 	CompileObject(a_v3Color);
@@ -127,9 +152,14 @@ void MyPrimitive::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivis
 void MyPrimitive::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color)
 {
 	if (a_nSubdivisions < 3)
+	{
 		a_nSubdivisions = 3;
+	}
 	if (a_nSubdivisions > 360)
+	{
 		a_nSubdivisions = 360;
+	}
+		
 
 	Release();
 	Init();
@@ -139,12 +169,30 @@ void MyPrimitive::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubd
 	//3--2
 	//|  |
 	//0--1
-	vector3 point0(-fValue, -fValue, fValue); //0
-	vector3 point1(fValue, -fValue, fValue); //1
-	vector3 point2(fValue, fValue, fValue); //2
-	vector3 point3(-fValue, fValue, fValue); //3
-
-	AddQuad(point0, point1, point3, point2);
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		float interval = 2 * PI / a_nSubdivisions;
+		float theta = interval * i;
+		//top circle
+		AddTri(
+			fValue*vector3(0.0f, 0.0f, a_fHeight),
+			fValue*a_fRadius*vector3(cos(theta), sin(theta), a_fHeight),
+			fValue*a_fRadius*vector3(cos(theta + interval), sin(theta + interval), a_fHeight)
+		);
+		//bottom circle
+		AddTri(
+			fValue*vector3(0.0f, 0.0f, -a_fHeight),
+			fValue*a_fRadius*vector3(cos(theta + interval), sin(theta + interval), -a_fHeight),
+			fValue*a_fRadius*vector3(cos(theta), sin(theta), -a_fHeight)
+		);
+		//middle
+		AddQuad(
+			fValue*a_fRadius*vector3(cos(theta), sin(theta), -a_fHeight),
+			fValue*a_fRadius*vector3(cos(theta + interval), sin(theta + interval), -a_fHeight),
+			fValue*a_fRadius*vector3(cos(theta), sin(theta), a_fHeight),
+			fValue*a_fRadius*vector3(cos(theta + interval), sin(theta + interval), a_fHeight)
+		);
+	}
 
 	//Your code ends here
 	CompileObject(a_v3Color);
@@ -152,9 +200,14 @@ void MyPrimitive::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubd
 void MyPrimitive::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fHeight, int a_nSubdivisions, vector3 a_v3Color)
 {
 	if (a_nSubdivisions < 3)
+	{
 		a_nSubdivisions = 3;
+	}
 	if (a_nSubdivisions > 360)
+	{
 		a_nSubdivisions = 360;
+	}
+		
 
 	Release();
 	Init();
@@ -164,12 +217,39 @@ void MyPrimitive::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float
 	//3--2
 	//|  |
 	//0--1
-	vector3 point0(-fValue, -fValue, fValue); //0
-	vector3 point1(fValue, -fValue, fValue); //1
-	vector3 point2(fValue, fValue, fValue); //2
-	vector3 point3(-fValue, fValue, fValue); //3
-
-	AddQuad(point0, point1, point3, point2);
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		float interval = 2 * PI / a_nSubdivisions;
+		float theta = interval * i;
+		//top
+		AddQuad(
+			fValue*vector3(a_fInnerRadius*cos(theta), a_fInnerRadius*sin(theta), -a_fHeight),
+			fValue*vector3(a_fInnerRadius*cos(theta + interval), a_fInnerRadius*sin(theta + interval), -a_fHeight),
+			fValue*vector3(a_fOuterRadius*cos(theta), a_fOuterRadius*sin(theta), -a_fHeight),
+			fValue*vector3(a_fOuterRadius*cos(theta + interval), a_fOuterRadius*sin(theta + interval), -a_fHeight)
+		);
+		//bottom
+		AddQuad(
+			fValue*vector3(a_fOuterRadius*cos(theta), a_fOuterRadius*sin(theta), a_fHeight),
+			fValue*vector3(a_fOuterRadius*cos(theta + interval), a_fOuterRadius*sin(theta + interval), a_fHeight),
+			fValue*vector3(a_fInnerRadius*cos(theta), a_fInnerRadius*sin(theta), a_fHeight),
+			fValue*vector3(a_fInnerRadius*cos(theta + interval), a_fInnerRadius*sin(theta + interval), a_fHeight)
+		);
+		//outside
+		AddQuad(
+			fValue*vector3(a_fOuterRadius*cos(theta), a_fOuterRadius*sin(theta), -a_fHeight),
+			fValue*vector3(a_fOuterRadius*cos(theta + interval), a_fOuterRadius*sin(theta + interval), -a_fHeight),
+			fValue*vector3(a_fOuterRadius*cos(theta), a_fOuterRadius*sin(theta), a_fHeight),
+			fValue*vector3(a_fOuterRadius*cos(theta + interval), a_fOuterRadius*sin(theta + interval), a_fHeight)
+		);
+		//inside
+		AddQuad(
+			fValue*vector3(a_fInnerRadius*cos(theta + interval), a_fInnerRadius*sin(theta + interval), -a_fHeight),
+			fValue*vector3(a_fInnerRadius*cos(theta), a_fInnerRadius*sin(theta), -a_fHeight),
+			fValue*vector3(a_fInnerRadius*cos(theta + interval), a_fInnerRadius*sin(theta + interval), a_fHeight),
+			fValue*vector3(a_fInnerRadius*cos(theta), a_fInnerRadius*sin(theta), a_fHeight)
+		);
+	}
 
 	//Your code ends here
 	CompileObject(a_v3Color);
@@ -215,8 +295,11 @@ void MyPrimitive::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a
 		GenerateCube(a_fRadius * 2, a_v3Color);
 		return;
 	}
-	if (a_nSubdivisions > 6)
-		a_nSubdivisions = 6;
+	if (a_nSubdivisions > 30)
+	{
+		a_nSubdivisions = 30;
+	}
+		
 
 	Release();
 	Init();
@@ -226,12 +309,25 @@ void MyPrimitive::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a
 	//3--2
 	//|  |
 	//0--1
-	vector3 point0(-fValue, -fValue, fValue); //0
-	vector3 point1(fValue, -fValue, fValue); //1
-	vector3 point2(fValue, fValue, fValue); //2
-	vector3 point3(-fValue, fValue, fValue); //3
-
-	AddQuad(point0, point1, point3, point2);
+	
+	//middle
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		for (int j = 0; j < a_nSubdivisions; j++)
+		{
+			float interval = 2 * PI / a_nSubdivisions;
+			float theta = interval * i;
+			float phi = interval * j;
+			
+			//follow the same pattern as a cylinder, but for two angles and using the cartesian system for spherical coordinates
+			AddQuad(
+				fValue*a_fRadius*vector3(sin(theta)*cos(phi), sin(theta)*sin(phi), cos(theta)),
+				fValue*a_fRadius*vector3(sin(theta + interval)*cos(phi), sin(theta + interval)*sin(phi), cos(theta + interval)),
+				fValue*a_fRadius*vector3(sin(theta)*cos(phi + interval), sin(theta)*sin(phi + interval), cos(theta)),
+				fValue*a_fRadius*vector3(sin(theta + interval)*cos(phi + interval), sin(theta + interval)*sin(phi + interval), cos(theta + interval))
+			);
+		}
+	}
 
 	//Your code ends here
 	CompileObject(a_v3Color);
